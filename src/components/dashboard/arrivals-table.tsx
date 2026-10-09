@@ -1,60 +1,15 @@
 import { Badge, Card, HStack, Table, Text, Wrap } from "@chakra-ui/react";
 import { ReservationLink, RoomLink } from "@/components/ops/entity-links";
+import { EarlyCheckInLabel, Empty, NextStepLabel } from "@/components/ops/reservation-parts";
 import { ToneBadge } from "@/components/ops/tone-badge";
-import { formatTime, formatWon } from "@/lib/format";
+import { formatTime } from "@/lib/format";
 import {
-  actorTone,
-  nextStepLabel,
-  offerStatusTone,
   reservationStatusTone,
   roomRequestLabel,
   roomStatusTone,
   roomTypeLabel,
 } from "@/lib/labels";
-import type { ArrivalRow, LocalDateTime, NextStep } from "@/lib/types";
-
-const EMPTY = (
-  <Text as="span" color="fg.subtle">
-    —
-  </Text>
-);
-
-function EarlyCheckIn({ row }: { row: ArrivalRow }) {
-  if (!row.offerStatus) return EMPTY;
-  return (
-    <HStack gap="1.5">
-      <ToneBadge tone={offerStatusTone[row.offerStatus]} />
-      {row.offerStatus === "ACCEPTED" && row.earlyCheckInFee !== null && (
-        <Text as="span" textStyle="xs" fontVariantNumeric="tabular-nums">
-          {formatTime(row.earlyCheckInAt)} · {formatWon(row.earlyCheckInFee)}
-        </Text>
-      )}
-    </HStack>
-  );
-}
-
-function NextStepCell({ step, now }: { step: NextStep | null; now: LocalDateTime }) {
-  if (!step) return EMPTY;
-  const { label, due } = nextStepLabel[step.type];
-  // 같은 형식의 ISO 문자열이라 문자열 비교로 시각 순서를 판단한다
-  const overdue = step.dueAt !== null && step.dueAt < now;
-  return (
-    <HStack gap="1.5">
-      <ToneBadge tone={actorTone[step.actor]} size="sm" />
-      <Text as="span">{label}</Text>
-      {step.dueAt && (
-        <Text
-          as="span"
-          textStyle="xs"
-          color={overdue ? "fg.error" : "fg.muted"}
-          fontVariantNumeric="tabular-nums"
-        >
-          {formatTime(step.dueAt)} {overdue ? "지남" : due}
-        </Text>
-      )}
-    </HStack>
-  );
-}
+import type { ArrivalRow, LocalDateTime } from "@/lib/types";
 
 export function ArrivalsTable({ arrivals, now }: { arrivals: ArrivalRow[]; now: LocalDateTime }) {
   return (
@@ -116,13 +71,17 @@ export function ArrivalsTable({ arrivals, now }: { arrivals: ArrivalRow[]; now: 
                     <ToneBadge tone={reservationStatusTone[row.status]} />
                   </Table.Cell>
                   <Table.Cell>
-                    {row.roomStatus ? <ToneBadge tone={roomStatusTone[row.roomStatus]} /> : EMPTY}
+                    {row.roomStatus ? <ToneBadge tone={roomStatusTone[row.roomStatus]} /> : <Empty />}
                   </Table.Cell>
                   <Table.Cell>
-                    <EarlyCheckIn row={row} />
+                    <EarlyCheckInLabel
+                      offerStatus={row.offerStatus}
+                      earlyCheckInAt={row.earlyCheckInAt}
+                      earlyCheckInFee={row.earlyCheckInFee}
+                    />
                   </Table.Cell>
                   <Table.Cell>
-                    <NextStepCell step={row.nextStep} now={now} />
+                    <NextStepLabel step={row.nextStep} now={now} />
                   </Table.Cell>
                 </Table.Row>
               ))}

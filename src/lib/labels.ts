@@ -3,12 +3,15 @@ import type {
   Actor,
   AlertLevel,
   AlertType,
+  AssignmentLock,
+  ExclusionReason,
   NextStepType,
   OfferStatus,
   ReservationStatus,
   RoomRequest,
   RoomStatus,
   RoomType,
+  RoomView,
 } from "./types";
 
 interface Tone {
@@ -62,8 +65,10 @@ export const alertTypeLabel: Record<AlertType, string> = {
   UNASSIGNED: "미배정",
 };
 
-/** 다음 할 일. `due`는 예정 시각(dueAt) 뒤에 붙이는 말 */
-export const nextStepLabel: Record<NextStepType, { label: string; due: "까지" | "예정" }> = {
+/**
+ * 다음 할 일. `due`는 예정 시각(dueAt) 뒤에 붙이는 말. "부터"는 그 시각 이후 언제든 되는 일이라 지나도 늦은 것이 아니다.
+ */
+export const nextStepLabel: Record<NextStepType, { label: string; due: "까지" | "예정" | "부터" }> = {
   ASSIGN_ROOM: { label: "객실 배정", due: "까지" },
   WAIT_CHECKOUT: { label: "이전 투숙객 퇴실", due: "예정" },
   START_CLEANING: { label: "청소 시작", due: "까지" },
@@ -71,7 +76,7 @@ export const nextStepLabel: Record<NextStepType, { label: string; due: "까지" 
   NOON_NOTICE: { label: "정오 안내 발송", due: "예정" },
   GUEST_PAYMENT: { label: "얼리체크인 결제", due: "까지" },
   SEND_PASSWORD: { label: "비밀번호 발송", due: "예정" },
-  GUEST_ARRIVAL: { label: "고객 입실", due: "예정" },
+  GUEST_ARRIVAL: { label: "고객 입실", due: "부터" },
 };
 
 export const roomTypeLabel: Record<RoomType, string> = {
@@ -83,4 +88,20 @@ export const roomTypeLabel: Record<RoomType, string> = {
 export const roomRequestLabel: Record<RoomRequest, string> = {
   HIGH_FLOOR: "고층",
   CITY_VIEW: "시티뷰",
+};
+
+export const roomViewLabel: Record<RoomView, string> = {
+  CITY: "시티뷰",
+  COURTYARD: "중정뷰",
+};
+
+export const exclusionReasonLabel: Record<ExclusionReason, string> = {
+  ROOM_TYPE_MISMATCH: "객실 타입 불일치",
+  OUT_OF_SERVICE: "운영 중지",
+  STAY_OVERLAP: "숙박 기간 겹침",
+};
+
+export const assignmentLockMessage: Record<AssignmentLock, string> = {
+  CHECKED_IN: "이미 입실(또는 퇴실)한 예약이라 배정을 바꿀 수 없습니다.",
+  NOTICE_SENT: "정오 안내가 발송된 예약이라 배정을 바꾸거나 취소할 수 없습니다.",
 };

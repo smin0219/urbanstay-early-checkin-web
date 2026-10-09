@@ -32,7 +32,7 @@ BACKEND_URL=http://localhost:8081 npm run dev
 | 경로 | 화면 | 상태 |
 | --- | --- | --- |
 | `/dashboard` | 운영 대시보드: 가상 시계, 요약 카드, 운영자 알림, 오늘 체크인 예약 | 구현 |
-| `/reservations/{id}` | 예약 상세·객실 배정 | 예정 |
+| `/reservations/{id}` | 예약 상세·객실 배정: 예약 정보, 추천 객실과 항목별 일치, 제외된 객실과 이유, 배정 | 구현 |
 | `/rooms/{number}` | 객실 운영 상세 | 예정 |
 | `/check-in/{token}` | 고객 얼리체크인 (모바일) | 예정 |
 

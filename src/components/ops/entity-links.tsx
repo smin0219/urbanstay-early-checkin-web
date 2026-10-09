@@ -1,4 +1,5 @@
 import { Link } from "@chakra-ui/react";
+import { LuArrowLeft } from "react-icons/lu";
 import NextLink from "next/link";
 import type { ReactNode } from "react";
 
@@ -16,6 +17,16 @@ export function RoomLink({ number }: { number: string }) {
   return (
     <Link asChild fontWeight="medium" colorPalette="blue">
       <NextLink href={`/rooms/${number}`}>{number}호</NextLink>
+    </Link>
+  );
+}
+
+export function BackToDashboard() {
+  return (
+    <Link asChild textStyle="sm" color="fg.muted" width="fit-content">
+      <NextLink href="/dashboard">
+        <LuArrowLeft /> 대시보드
+      </NextLink>
     </Link>
   );
 }

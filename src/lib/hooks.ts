@@ -1,8 +1,13 @@
 "use client";
 
 import useSWR, { useSWRConfig } from "swr";
-import { apiPost, fetcher } from "./api";
-import type { ClockState, Dashboard, LocalDateTime } from "./types";
+import { apiDelete, apiPost, fetcher } from "./api";
+import type {
+  ClockState,
+  Dashboard,
+  LocalDateTime,
+  ReservationDetailResponse,
+} from "./types";
 
 export function useClock() {
   return useSWR<ClockState>("/api/clock", fetcher);
@@ -10,6 +15,10 @@ export function useClock() {
 
 export function useDashboard() {
   return useSWR<Dashboard>("/api/dashboard", fetcher);
+}
+
+export function useReservation(id: number) {
+  return useSWR<ReservationDetailResponse>(`/api/reservations/${id}`, fetcher);
 }
 
 /**
@@ -29,6 +38,20 @@ export function useClockActions() {
     },
     resetScenario: async () => {
       await apiPost<ClockState>("/api/scenario/reset");
+      await revalidateAll();
+    },
+  };
+}
+
+export function useReservationActions(id: number) {
+  const revalidateAll = useRevalidateAll();
+  return {
+    assignRoom: async (roomNumber: string) => {
+      await apiPost<ReservationDetailResponse>(`/api/reservations/${id}/assignment`, { roomNumber });
+      await revalidateAll();
+    },
+    unassign: async () => {
+      await apiDelete<ReservationDetailResponse>(`/api/reservations/${id}/assignment`);
       await revalidateAll();
     },
   };
