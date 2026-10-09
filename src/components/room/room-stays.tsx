@@ -1,6 +1,6 @@
-import { Card, DataList, SimpleGrid, Text } from "@chakra-ui/react";
+import { Card, DataList, HStack, SimpleGrid, Text } from "@chakra-ui/react";
 import type { ReactNode } from "react";
-import { ReservationLink } from "@/components/ops/entity-links";
+import { GuestScreenLink, ReservationLink } from "@/components/ops/entity-links";
 import { EarlyCheckInLabel, NextStepLabel } from "@/components/ops/reservation-parts";
 import { ToneBadge } from "@/components/ops/tone-badge";
 import { formatMonthDay, formatTime } from "@/lib/format";
@@ -30,7 +30,10 @@ export function RoomStays({ detail }: { detail: RoomDetailResponse }) {
         {arrival ? (
           <>
             <Item label="고객">
-              <ReservationLink id={arrival.reservationId}>{arrival.guestName}</ReservationLink>
+              <HStack gap="2">
+                <ReservationLink id={arrival.reservationId}>{arrival.guestName}</ReservationLink>
+                <GuestScreenLink token={arrival.checkInToken} />
+              </HStack>
             </Item>
             <Item label="예약 상태">
               <ToneBadge tone={reservationStatusTone[arrival.status]} />

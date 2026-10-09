@@ -1,5 +1,5 @@
 import { Link } from "@chakra-ui/react";
-import { LuArrowLeft } from "react-icons/lu";
+import { LuArrowLeft, LuExternalLink } from "react-icons/lu";
 import NextLink from "next/link";
 import type { ReactNode } from "react";
 
@@ -17,6 +17,15 @@ export function RoomLink({ number }: { number: string }) {
   return (
     <Link asChild fontWeight="medium" colorPalette="blue">
       <NextLink href={`/rooms/${number}`}>{number}호</NextLink>
+    </Link>
+  );
+}
+
+/** 고객 얼리체크인 화면. 고객이 정오 안내 문자로 받는 링크와 같다. */
+export function GuestScreenLink({ token }: { token: string }) {
+  return (
+    <Link href={`/check-in/${token}`} target="_blank" rel="noreferrer" textStyle="sm" colorPalette="blue">
+      고객 화면 <LuExternalLink />
     </Link>
   );
 }

@@ -5,6 +5,7 @@ import { apiDelete, apiPost, fetcher } from "./api";
 import type {
   ClockState,
   Dashboard,
+  GuestCheckInResponse,
   LocalDateTime,
   ReservationDetailResponse,
   RoomAction,
@@ -25,6 +26,11 @@ export function useReservation(id: number) {
 
 export function useRoom(number: string) {
   return useSWR<RoomDetailResponse>(`/api/rooms/${number}`, fetcher);
+}
+
+/** 고객 화면은 운영 화면과 다른 탭에서 열리므로, 운영자가 시계를 옮기면 따라오도록 주기적으로 다시 조회한다. */
+export function useGuestCheckIn(token: string) {
+  return useSWR<GuestCheckInResponse>(`/api/check-in/${token}`, fetcher, { refreshInterval: 3000 });
 }
 
 /**
@@ -74,6 +80,26 @@ export function useRoomActions(number: string) {
   return {
     run: async (action: RoomAction) => {
       await apiPost<RoomDetailResponse>(`/api/rooms/${number}/${ROOM_ACTION_PATH[action]}`);
+      await revalidateAll();
+    },
+  };
+}
+
+export function useGuestActions(token: string) {
+  const revalidateAll = useRevalidateAll();
+  const base = `/api/check-in/${token}`;
+  return {
+    /** `checkInAt`이 null이면 "지금 바로" */
+    pay: async (checkInAt: LocalDateTime | null, expectedFee: number, idempotencyKey: string) => {
+      await apiPost<GuestCheckInResponse>(`${base}/payment`, { checkInAt, expectedFee, idempotencyKey });
+      await revalidateAll();
+    },
+    decline: async () => {
+      await apiPost<GuestCheckInResponse>(`${base}/decline`);
+      await revalidateAll();
+    },
+    openDoor: async () => {
+      await apiPost<GuestCheckInResponse>(`${base}/door`);
       await revalidateAll();
     },
   };

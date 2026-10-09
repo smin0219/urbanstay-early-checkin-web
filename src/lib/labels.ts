@@ -50,6 +50,7 @@ export const offerStatusTone: Record<OfferStatus, Tone> = {
   ACCEPTED: { label: "확정", color: "teal" },
   DECLINED: { label: "거절", color: "gray" },
   EXPIRED: { label: "만료", color: "gray" },
+  REFUNDED: { label: "환불", color: "red" },
 };
 
 export const alertLevelTone: Record<AlertLevel, Tone> = {
@@ -123,6 +124,8 @@ export const roomEventLabel: Record<RoomEvent, string> = {
   CHECK_OUT: "퇴실",
   CLEANING_STARTED: "청소 시작",
   CLEANING_FINISHED: "청소 완료",
+  ISSUE_REPORTED: "문제 발견",
+  CHECK_IN: "입실",
 };
 
 export const messageTypeTone: Record<MessageType, Tone> = {
@@ -130,6 +133,7 @@ export const messageTypeTone: Record<MessageType, Tone> = {
   EARLY_OFFER: { label: "얼리체크인 제안", color: "purple" },
   PASSWORD: { label: "비밀번호", color: "green" },
   DELAY_NOTICE: { label: "지연 안내", color: "orange" },
+  EARLY_CHECKIN_REFUND: { label: "환불 안내", color: "red" },
 };
 
 /** 알림 규칙은 조건 충족이 곧 "알림이 떠 있음"이다. */

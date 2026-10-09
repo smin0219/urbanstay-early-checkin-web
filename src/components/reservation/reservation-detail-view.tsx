@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, Heading, HStack, Spinner, Stack, Text } from "@chakra-ui/react";
-import { BackToDashboard } from "@/components/ops/entity-links";
+import { BackToDashboard, GuestScreenLink } from "@/components/ops/entity-links";
 import { OperatorAlerts } from "@/components/ops/operator-alerts";
 import { ToneBadge } from "@/components/ops/tone-badge";
 import { ApiError } from "@/lib/api";
@@ -37,6 +37,7 @@ export function ReservationDetailView({ id }: { id: number }) {
               예약 #{data.reservation.id}
             </Text>
             <ToneBadge tone={reservationStatusTone[data.reservation.status]} />
+            <GuestScreenLink token={data.reservation.checkInToken} />
           </HStack>
           <OperatorAlerts alerts={data.alerts} />
           <ReservationSummary reservation={data.reservation} now={data.now} />

@@ -32,7 +32,7 @@ export type RoomView = "CITY" | "COURTYARD";
 
 export type RoomRequest = "HIGH_FLOOR" | "CITY_VIEW";
 
-export type OfferStatus = "SENT" | "ACCEPTED" | "DECLINED" | "EXPIRED";
+export type OfferStatus = "SENT" | "ACCEPTED" | "DECLINED" | "EXPIRED" | "REFUNDED";
 
 export type AlertType =
   | "EARLY_CHECKOUT"
@@ -176,6 +176,8 @@ export interface ReservationDetail {
   earlyCheckInAt: LocalDateTime | null;
   earlyCheckInFee: number | null;
   nextStep: NextStep | null;
+  /** 고객 화면(/check-in/{token}) 링크 */
+  checkInToken: string;
 }
 
 export interface ReservationDetailResponse {
@@ -200,13 +202,16 @@ export type RoomEvent =
   | "INITIAL"
   | "CHECK_OUT"
   | "CLEANING_STARTED"
-  | "CLEANING_FINISHED";
+  | "CLEANING_FINISHED"
+  | "ISSUE_REPORTED"
+  | "CHECK_IN";
 
 export type MessageType =
   | "NOON_NOTICE"
   | "EARLY_OFFER"
   | "PASSWORD"
-  | "DELAY_NOTICE";
+  | "DELAY_NOTICE"
+  | "EARLY_CHECKIN_REFUND";
 
 export type RuleName = "EARLY_OFFER" | "PASSWORD" | "CLEANING_WARNING" | "EARLY_CHECKOUT";
 
@@ -262,6 +267,7 @@ export interface RoomArrival {
   earlyCheckInFee: number | null;
   checkedInAt: LocalDateTime | null;
   nextStep: NextStep | null;
+  checkInToken: string;
 }
 
 export interface TimelineEntry {
@@ -297,4 +303,43 @@ export interface RoomDetailResponse {
   alerts: OperatorAlert[];
   timeline: TimelineEntry[];
   messages: MessageEntry[];
+}
+
+// 고객 얼리체크인
+
+export type GuestStage =
+  | "BEFORE_NOTICE"
+  | "OFFER_OPEN"
+  | "EARLY_CONFIRMED"
+  | "WAITING_PASSWORD"
+  | "PASSWORD_HELD"
+  | "PASSWORD_READY"
+  | "CHECKED_IN";
+
+export interface EarlyCheckInOption {
+  checkInAt: LocalDateTime;
+  /** "지금 바로" 선택지 */
+  immediate: boolean;
+  fee: number;
+}
+
+export interface GuestCheckInResponse {
+  now: LocalDateTime;
+  guestName: string;
+  checkInDate: LocalDate;
+  checkOutDate: LocalDate;
+  standardCheckInAt: LocalDateTime;
+  stage: GuestStage;
+  /** 정오 안내 후에만 */
+  room: { number: string; floor: number } | null;
+  /** 결제를 기다리는 제안이 있을 때만 */
+  offer: { options: EarlyCheckInOption[]; deadline: LocalDateTime } | null;
+  earlyCheckIn: { checkInAt: LocalDateTime; fee: number; paidAt: LocalDateTime } | null;
+  offerStatus: OfferStatus | null;
+  /** 비밀번호를 보낼 예정 시각 */
+  passwordAt: LocalDateTime | null;
+  /** 비밀번호 발송 후에만 */
+  password: { doorCode: string; sentAt: LocalDateTime } | null;
+  delayed: boolean;
+  checkedInAt: LocalDateTime | null;
 }
