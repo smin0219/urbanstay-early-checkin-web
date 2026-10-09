@@ -1,10 +1,16 @@
 import type { ColorPalette } from "@chakra-ui/react";
+import { formatTime } from "./format";
 import type {
   Actor,
   AlertLevel,
   AlertType,
   AssignmentLock,
   ExclusionReason,
+  MessageType,
+  RoomAction,
+  RoomEvent,
+  RuleCondition,
+  RuleName,
   NextStepType,
   OfferStatus,
   ReservationStatus,
@@ -105,3 +111,69 @@ export const assignmentLockMessage: Record<AssignmentLock, string> = {
   CHECKED_IN: "이미 입실(또는 퇴실)한 예약이라 배정을 바꿀 수 없습니다.",
   NOTICE_SENT: "정오 안내가 발송된 예약이라 배정을 바꾸거나 취소할 수 없습니다.",
 };
+
+export const roomActionLabel: Record<RoomAction, string> = {
+  CHECK_OUT: "퇴실 처리",
+  START_CLEANING: "청소 시작",
+  FINISH_CLEANING: "청소 완료",
+};
+
+export const roomEventLabel: Record<RoomEvent, string> = {
+  INITIAL: "시나리오 시작",
+  CHECK_OUT: "퇴실",
+  CLEANING_STARTED: "청소 시작",
+  CLEANING_FINISHED: "청소 완료",
+};
+
+export const messageTypeTone: Record<MessageType, Tone> = {
+  NOON_NOTICE: { label: "정오 안내", color: "blue" },
+  EARLY_OFFER: { label: "얼리체크인 제안", color: "purple" },
+  PASSWORD: { label: "비밀번호", color: "green" },
+  DELAY_NOTICE: { label: "지연 안내", color: "orange" },
+};
+
+/** 알림 규칙은 조건 충족이 곧 "알림이 떠 있음"이다. */
+export const ruleInfo: Record<RuleName, { label: string; alert: boolean }> = {
+  EARLY_OFFER: { label: "얼리체크인 제안", alert: false },
+  PASSWORD: { label: "비밀번호 발송", alert: false },
+  CLEANING_WARNING: { label: "청소 지연 경고", alert: true },
+  EARLY_CHECKOUT: { label: "조기 퇴실 알림", alert: true },
+};
+
+/** 판단 조건 문구. 시각 비교 조건은 기준 시각을 문구에, 실제 값을 detail에 넣는다. */
+export function conditionText(c: RuleCondition): { label: string; detail?: string } {
+  const actual = c.actual ? formatTime(c.actual) : undefined;
+  const threshold = formatTime(c.threshold);
+  switch (c.type) {
+    case "CHECK_IN_TODAY":
+      return { label: "예약 체크인일이 오늘" };
+    case "ROOM_ASSIGNED":
+      return { label: "예약에 이 객실이 배정됨" };
+    case "ROOM_READY":
+      return { label: "객실 준비 완료", detail: actual && `${actual} 준비` };
+    case "NOON_REACHED":
+      return { label: `현재 시각 ≥ 정오 안내 시각 ${threshold}`, detail: actual && `현재 ${actual}` };
+    case "AVAILABLE_BY_DEADLINE":
+      return {
+        label: `입실 가능 시각 ≤ ${threshold}`,
+        detail: actual ? `입실 가능 ${actual}` : "객실 준비 전",
+      };
+    case "NO_PREVIOUS_OFFER":
+      return { label: "이 예약에 보낸 제안 없음 (예약당 1회)" };
+    case "SEND_TIME_REACHED":
+      return { label: `현재 시각 ≥ 발송 시각 ${threshold}`, detail: actual && `현재 ${actual}` };
+    case "WARNING_TIME_REACHED":
+      return { label: `현재 시각 ≥ 경고 시각 ${threshold}`, detail: actual && `현재 ${actual}` };
+    case "ROOM_NOT_READY":
+      return { label: "객실 미준비" };
+    case "CHECKED_OUT_EARLY":
+      return {
+        label: `퇴실 시각 ≤ ${threshold} (예정 퇴실보다 30분 이상 일찍)`,
+        detail: actual ? `${actual} 퇴실` : "퇴실 전",
+      };
+    case "HAS_ARRIVAL_TODAY":
+      return { label: "이 객실에 오늘 체크인 예약 있음" };
+    case "CLEANING_NOT_STARTED":
+      return { label: "청소 시작 전" };
+  }
+}

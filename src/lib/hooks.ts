@@ -7,6 +7,8 @@ import type {
   Dashboard,
   LocalDateTime,
   ReservationDetailResponse,
+  RoomAction,
+  RoomDetailResponse,
 } from "./types";
 
 export function useClock() {
@@ -19,6 +21,10 @@ export function useDashboard() {
 
 export function useReservation(id: number) {
   return useSWR<ReservationDetailResponse>(`/api/reservations/${id}`, fetcher);
+}
+
+export function useRoom(number: string) {
+  return useSWR<RoomDetailResponse>(`/api/rooms/${number}`, fetcher);
 }
 
 /**
@@ -52,6 +58,22 @@ export function useReservationActions(id: number) {
     },
     unassign: async () => {
       await apiDelete<ReservationDetailResponse>(`/api/reservations/${id}/assignment`);
+      await revalidateAll();
+    },
+  };
+}
+
+const ROOM_ACTION_PATH: Record<RoomAction, string> = {
+  CHECK_OUT: "checkout",
+  START_CLEANING: "cleaning/start",
+  FINISH_CLEANING: "cleaning/finish",
+};
+
+export function useRoomActions(number: string) {
+  const revalidateAll = useRevalidateAll();
+  return {
+    run: async (action: RoomAction) => {
+      await apiPost<RoomDetailResponse>(`/api/rooms/${number}/${ROOM_ACTION_PATH[action]}`);
       await revalidateAll();
     },
   };

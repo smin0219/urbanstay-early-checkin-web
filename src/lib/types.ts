@@ -191,3 +191,110 @@ export interface ReservationDetailResponse {
     excluded: ExcludedRoom[];
   };
 }
+
+// 객실 운영 상세
+
+export type RoomAction = "CHECK_OUT" | "START_CLEANING" | "FINISH_CLEANING";
+
+export type RoomEvent =
+  | "INITIAL"
+  | "CHECK_OUT"
+  | "CLEANING_STARTED"
+  | "CLEANING_FINISHED";
+
+export type MessageType =
+  | "NOON_NOTICE"
+  | "EARLY_OFFER"
+  | "PASSWORD"
+  | "DELAY_NOTICE";
+
+export type RuleName = "EARLY_OFFER" | "PASSWORD" | "CLEANING_WARNING" | "EARLY_CHECKOUT";
+
+export type RuleOutcome = "DONE" | "MET" | "NOT_MET";
+
+export type ConditionType =
+  | "CHECK_IN_TODAY"
+  | "ROOM_ASSIGNED"
+  | "ROOM_READY"
+  | "NOON_REACHED"
+  | "AVAILABLE_BY_DEADLINE"
+  | "NO_PREVIOUS_OFFER"
+  | "SEND_TIME_REACHED"
+  | "WARNING_TIME_REACHED"
+  | "ROOM_NOT_READY"
+  | "CHECKED_OUT_EARLY"
+  | "HAS_ARRIVAL_TODAY"
+  | "CLEANING_NOT_STARTED";
+
+export interface RuleCondition {
+  type: ConditionType;
+  satisfied: boolean;
+  /** 비교한 실제 값 (시각 비교가 아니면 null) */
+  actual: LocalDateTime | null;
+  /** 기준 값 (시각 비교가 아니면 null) */
+  threshold: LocalDateTime | null;
+}
+
+/** 규칙 엔진 판단 근거 */
+export interface RuleCheck {
+  rule: RuleName;
+  outcome: RuleOutcome;
+  conditions: RuleCondition[];
+}
+
+export interface Stay {
+  reservationId: number;
+  guestName: string;
+  checkInDate: LocalDate;
+  checkOutDate: LocalDate;
+  scheduledCheckOut: LocalDateTime;
+  status: ReservationStatus;
+  checkedOutAt: LocalDateTime | null;
+}
+
+export interface RoomArrival {
+  reservationId: number;
+  guestName: string;
+  status: ReservationStatus;
+  checkInAt: LocalDateTime;
+  offerStatus: OfferStatus | null;
+  earlyCheckInAt: LocalDateTime | null;
+  earlyCheckInFee: number | null;
+  checkedInAt: LocalDateTime | null;
+  nextStep: NextStep | null;
+}
+
+export interface TimelineEntry {
+  at: LocalDateTime;
+  event: RoomEvent;
+  from: RoomStatus | null;
+  to: RoomStatus;
+  guestName: string | null;
+}
+
+export interface MessageEntry {
+  sentAt: LocalDateTime;
+  type: MessageType;
+  reservationId: number;
+  guestName: string;
+  /** 발송 시점의 객실 상태 */
+  roomStatus: RoomStatus;
+  content: string;
+}
+
+export interface RoomDetailResponse {
+  now: LocalDateTime;
+  room: RoomInfo;
+  /** 지금 투숙 중인 다른 예약 (연박 등) */
+  inHouse: Stay | null;
+  /** 오늘 퇴실하는(또는 퇴실한) 이전 투숙객 */
+  departure: Stay | null;
+  /** 오늘 입실 예약 */
+  arrival: RoomArrival | null;
+  /** 지금 누를 수 있는 운영 버튼 */
+  actions: RoomAction[];
+  ruleChecks: RuleCheck[];
+  alerts: OperatorAlert[];
+  timeline: TimelineEntry[];
+  messages: MessageEntry[];
+}
