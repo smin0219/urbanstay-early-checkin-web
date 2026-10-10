@@ -7,6 +7,7 @@ import type {
   AssignmentLock,
   ExclusionReason,
   MessageType,
+  MilestoneType,
   RoomAction,
   RoomEvent,
   RuleCondition,
@@ -110,7 +111,7 @@ export const exclusionReasonLabel: Record<ExclusionReason, string> = {
 
 export const assignmentLockMessage: Record<AssignmentLock, string> = {
   CHECKED_IN: "이미 입실(또는 퇴실)한 예약이라 배정을 바꿀 수 없습니다.",
-  NOTICE_SENT: "정오 안내가 발송된 예약이라 배정을 바꾸거나 취소할 수 없습니다.",
+  NOTICE_SENT: "정오 안내나 얼리체크인 제안이 나간 예약이라 배정을 바꾸거나 취소할 수 없습니다.",
 };
 
 export const roomActionLabel: Record<RoomAction, string> = {
@@ -131,6 +132,7 @@ export const roomEventLabel: Record<RoomEvent, string> = {
 export const messageTypeTone: Record<MessageType, Tone> = {
   NOON_NOTICE: { label: "정오 안내", color: "blue" },
   EARLY_OFFER: { label: "얼리체크인 제안", color: "purple" },
+  EARLY_CONFIRMATION: { label: "얼리체크인 확정", color: "teal" },
   PASSWORD: { label: "비밀번호", color: "green" },
   DELAY_NOTICE: { label: "지연 안내", color: "orange" },
   EARLY_CHECKIN_REFUND: { label: "환불 안내", color: "red" },
@@ -155,12 +157,12 @@ export function conditionText(c: RuleCondition): { label: string; detail?: strin
       return { label: "예약에 이 객실이 배정됨" };
     case "ROOM_READY":
       return { label: "객실 준비 완료", detail: actual && `${actual} 준비` };
-    case "NOON_REACHED":
-      return { label: `현재 시각 ≥ 정오 안내 시각 ${threshold}`, detail: actual && `현재 ${actual}` };
-    case "AVAILABLE_BY_DEADLINE":
+    case "OFFER_WINDOW_OPEN":
+      return { label: `현재 시각 ≥ 제안 시작 시각 ${threshold}`, detail: actual && `현재 ${actual}` };
+    case "FIRST_SLOT_BY_DEADLINE":
       return {
-        label: `입실 가능 시각 ≤ ${threshold}`,
-        detail: actual ? `입실 가능 ${actual}` : "객실 준비 전",
+        label: `팔 수 있는 첫 입실 시각 ≤ ${threshold}`,
+        detail: actual ? `첫 입실 ${actual}` : "객실 준비 전",
       };
     case "NO_PREVIOUS_OFFER":
       return { label: "이 예약에 보낸 제안 없음 (예약당 1회)" };
@@ -181,3 +183,13 @@ export function conditionText(c: RuleCondition): { label: string; detail?: strin
       return { label: "청소 시작 전" };
   }
 }
+
+/** 시계 타임라인의 규칙 시각 이름 */
+export const milestoneLabel: Record<MilestoneType, string> = {
+  OFFER_START: "제안 시작",
+  NOON_NOTICE: "정오 안내",
+  CLEANING_WARNING: "청소 경고",
+  OFFER_EXPIRY: "제안 만료",
+  PASSWORD_SEND: "비밀번호",
+  STANDARD_CHECK_IN: "체크인",
+};

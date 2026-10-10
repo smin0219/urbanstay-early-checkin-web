@@ -6,7 +6,7 @@ import { formatTime, formatWon } from "@/lib/format";
 import { useGuestActions } from "@/lib/hooks";
 import type { EarlyCheckInOption, GuestCheckInResponse } from "@/lib/types";
 
-// "지금 바로"는 시각이 계속 바뀌므로 고정 키로 고른다
+// "지금 바로"는 보는 시각에 따라 값이 바뀌므로 고정 키로 고른다
 const optionKey = (option: EarlyCheckInOption) => (option.immediate ? "now" : option.checkInAt);
 
 interface OfferCardProps {
@@ -15,7 +15,10 @@ interface OfferCardProps {
   onError: (message: string | null) => void;
 }
 
-/** 입실 시각과 시각별 요금을 고르고 결제(목업)한다. 요금은 결제 시점에 서버가 다시 계산한다. */
+/**
+ * 입실 시각(정오 전에는 "지금 바로", 12시부터는 정각)과 요금을 고르고 결제(목업)한다. 서버가 결제 시점에 시각과 요금을 다시
+ * 확인한다.
+ */
 export function OfferCard({ token, view, onError }: OfferCardProps) {
   const { pay, decline } = useGuestActions(token);
   const [selected, setSelected] = useState<string | null>(null);
@@ -54,8 +57,8 @@ export function OfferCard({ token, view, onError }: OfferCardProps) {
               객실이 준비돼 있어요. 일찍 들어가실래요?
             </Text>
             <Text textStyle="sm" color="fg.muted">
-              체크인은 {formatTime(view.standardCheckInAt)}부터예요. 얼리체크인은 일찍 들어갈수록 시간당 요금이
-              붙어요.
+              체크인은 {formatTime(view.standardCheckInAt)}부터예요. 원하는 입실 시각을 골라 결제하시면 호수와 입실
+              방법을 바로 알려 드려요.
             </Text>
           </Stack>
           <RadioCard.Root
@@ -71,7 +74,7 @@ export function OfferCard({ token, view, onError }: OfferCardProps) {
                   <RadioCard.ItemControl>
                     <RadioCard.ItemContent flex="1" alignItems="flex-start">
                       <RadioCard.ItemText>
-                        {o.immediate ? `지금 바로 (${formatTime(o.checkInAt)})` : `${formatTime(o.checkInAt)} 입실`}
+                        {o.immediate ? "지금 바로 입실" : `${formatTime(o.checkInAt)} 입실`}
                       </RadioCard.ItemText>
                     </RadioCard.ItemContent>
                     <Text fontWeight="semibold" fontVariantNumeric="tabular-nums">
@@ -94,8 +97,10 @@ export function OfferCard({ token, view, onError }: OfferCardProps) {
               {option ? `${formatWon(option.fee)} 결제하기` : "입실 시각을 골라 주세요"}
             </Button>
             <Text textStyle="xs" color="fg.muted" textAlign="center">
-              {view.offer && `${formatTime(view.offer.deadline)}까지 신청할 수 있어요. `}데모용 결제라 실제로
-              청구되지 않습니다.
+              {options.some((o) => o.immediate)
+                ? "지금 바로 입실은 결제하면 비밀번호를 바로 보내 드려요. 정각 입실은 그 시각 전까지 결제할 수 있어요."
+                : "고른 시각 전까지 결제할 수 있어요."}{" "}
+              데모용 결제라 실제로 청구되지 않습니다.
             </Text>
             <Button
               variant="ghost"

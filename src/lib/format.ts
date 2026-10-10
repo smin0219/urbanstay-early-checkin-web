@@ -44,7 +44,13 @@ export function addMinutes(value: LocalDateTime, minutes: number): LocalDateTime
   return date.toISOString().slice(0, 19);
 }
 
-/** 같은 날짜의 다른 시각. `time`은 "HH:mm" */
-export function atTime(value: LocalDateTime, time: string): LocalDateTime {
-  return `${value.slice(0, 10)}T${time}:00`;
+/** 자정부터 지난 분. "2026-10-10T13:05:00" → 785 */
+export function minutesOfDay(value: LocalDateTime): number {
+  return Number(value.slice(11, 13)) * 60 + Number(value.slice(14, 16));
+}
+
+/** 같은 날짜에서 자정부터 `minutes`분 지난 시각 */
+export function atMinutes(value: LocalDateTime, minutes: number): LocalDateTime {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${value.slice(0, 10)}T${pad(Math.floor(minutes / 60))}:${pad(minutes % 60)}:00`;
 }

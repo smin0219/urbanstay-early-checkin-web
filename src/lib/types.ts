@@ -60,8 +60,23 @@ export interface NextStep {
   dueAt: LocalDateTime | null;
 }
 
+export type MilestoneType =
+  | "OFFER_START"
+  | "NOON_NOTICE"
+  | "CLEANING_WARNING"
+  | "OFFER_EXPIRY"
+  | "PASSWORD_SEND"
+  | "STANDARD_CHECK_IN";
+
+/** 오늘의 규칙 시각 (정책 설정값) */
+export interface ClockMilestone {
+  at: LocalDateTime;
+  type: MilestoneType;
+}
+
 export interface ClockState {
   now: LocalDateTime;
+  milestones: ClockMilestone[];
 }
 
 export interface DashboardSummary {
@@ -209,6 +224,7 @@ export type RoomEvent =
 export type MessageType =
   | "NOON_NOTICE"
   | "EARLY_OFFER"
+  | "EARLY_CONFIRMATION"
   | "PASSWORD"
   | "DELAY_NOTICE"
   | "EARLY_CHECKIN_REFUND";
@@ -221,8 +237,8 @@ export type ConditionType =
   | "CHECK_IN_TODAY"
   | "ROOM_ASSIGNED"
   | "ROOM_READY"
-  | "NOON_REACHED"
-  | "AVAILABLE_BY_DEADLINE"
+  | "OFFER_WINDOW_OPEN"
+  | "FIRST_SLOT_BY_DEADLINE"
   | "NO_PREVIOUS_OFFER"
   | "SEND_TIME_REACHED"
   | "WARNING_TIME_REACHED"
@@ -316,9 +332,10 @@ export type GuestStage =
   | "PASSWORD_READY"
   | "CHECKED_IN";
 
+/** 얼리체크인 입실 시각과 요금 */
 export interface EarlyCheckInOption {
   checkInAt: LocalDateTime;
-  /** "지금 바로" 선택지 */
+  /** "지금 바로" 입실 (정오 전에만). 결제하는 그 시각에 입실한다 */
   immediate: boolean;
   fee: number;
 }
@@ -330,9 +347,9 @@ export interface GuestCheckInResponse {
   checkOutDate: LocalDate;
   standardCheckInAt: LocalDateTime;
   stage: GuestStage;
-  /** 정오 안내 후에만 */
+  /** 정오 안내나 얼리체크인 결제 확정 후에만 */
   room: { number: string; floor: number } | null;
-  /** 결제를 기다리는 제안이 있을 때만 */
+  /** 결제를 기다리는 제안이 있을 때만. 정각은 그 전까지, "지금 바로"는 정오 전까지 결제 */
   offer: { options: EarlyCheckInOption[]; deadline: LocalDateTime } | null;
   earlyCheckIn: { checkInAt: LocalDateTime; fee: number; paidAt: LocalDateTime } | null;
   offerStatus: OfferStatus | null;
