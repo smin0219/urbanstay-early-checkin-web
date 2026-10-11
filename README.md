@@ -1,6 +1,6 @@
 # 어반스테이 얼리체크인 데모 — 프론트엔드
 
-어반스테이 얼리체크인 데모 과제의 웹 화면입니다. 운영 화면과 고객 화면을 맡고, 데이터와 규칙 판단은 백엔드 저장소의 API를 씁니다. 기획서·데모 진행 가이드·기술 문서는 이메일로 별도 전달합니다.
+어반스테이 얼리체크인 데모 과제의 웹 화면입니다. 운영 화면과 고객 화면을 맡고, 데이터와 규칙 판단은 [백엔드 저장소(urbanstay-early-checkin-api)](https://github.com/smin0219/urbanstay-early-checkin-api)의 API를 씁니다. 기획서·데모 진행 가이드·기술 문서는 이메일로 별도 전달합니다.
 
 ## 기술 스택
 
@@ -12,7 +12,7 @@
 ## 요구 사항
 
 - Node.js 22 이상, npm
-- 백엔드 서버 (기본 http://localhost:8080)
+- [백엔드 서버](https://github.com/smin0219/urbanstay-early-checkin-api) (기본 http://localhost:8080)
 
 ## 실행
 
