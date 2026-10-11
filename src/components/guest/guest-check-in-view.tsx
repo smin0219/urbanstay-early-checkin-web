@@ -90,7 +90,7 @@ function statusMessage(view: GuestCheckInResponse): { title: string; description
       return view.earlyCheckIn
         ? {
             title: `${formatTime(view.earlyCheckIn.checkInAt)} 얼리체크인이 확정됐어요`,
-            description: `${formatWon(view.earlyCheckIn.fee)} 결제 완료. ${formatTime(view.earlyCheckIn.checkInAt)}에 비밀번호를 보내드려요.`,
+            description: `${formatWon(view.earlyCheckIn.fee)} 결제 완료. ${formatTime(view.passwordAt)}에 비밀번호를 보내드려요.`,
           }
         : null;
     case "WAITING_PASSWORD":

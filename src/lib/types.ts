@@ -353,7 +353,7 @@ export interface GuestCheckInResponse {
   offer: { options: EarlyCheckInOption[]; deadline: LocalDateTime } | null;
   earlyCheckIn: { checkInAt: LocalDateTime; fee: number; paidAt: LocalDateTime } | null;
   offerStatus: OfferStatus | null;
-  /** 비밀번호를 보낼 예정 시각 */
+  /** 비밀번호를 보낼 예정 시각 (입실 시각 15분 전) */
   passwordAt: LocalDateTime | null;
   /** 비밀번호 발송 후에만 */
   password: { doorCode: string; sentAt: LocalDateTime } | null;
