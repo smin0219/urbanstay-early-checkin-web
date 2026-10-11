@@ -186,7 +186,7 @@ export function conditionText(c: RuleCondition): { label: string; detail?: strin
 
 /** 시계 타임라인의 규칙 시각 이름 */
 export const milestoneLabel: Record<MilestoneType, string> = {
-  OFFER_START: "제안 시작",
+  OFFER_START: "얼리체크인 제안 가능",
   NOON_NOTICE: "정오 안내",
   CLEANING_WARNING: "청소 경고",
   OFFER_EXPIRY: "제안 만료",
